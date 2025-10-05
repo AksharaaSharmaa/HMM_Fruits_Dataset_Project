@@ -1,8 +1,4 @@
-<center>
-
-# 🔊 HMM-Based Speech Recognition & Pronunciation Generator
-
-</center>
+<h1 align="center">🔊 HMM-Based Speech Recognition & Pronunciation Generator</h1>
 
 
 
