@@ -112,11 +112,6 @@ python app.py
 ```
 Access the web interface at http://localhost:8001
 
-### Running Speech Recognition
-```bash
-cd speech-recognition-hmm/isolated_word_recognition
-python fruits_speech_recognition.py
-```
 
 ## 📚 Technologies Used
 
