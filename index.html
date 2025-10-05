@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔊 HMM Pronunciation Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            grid-column: 1 / -1;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            margin-bottom: 30px;
+            grid-column: 1 / -1;
+        }
+
+        h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 250px;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 15px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .learned-phonemes {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .phoneme-item {
+            font-family: 'Courier New', monospace;
+            padding: 8px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .slider-value {
+            text-align: center;
+            font-weight: bold;
+            color: #667eea;
+            margin-top: 5px;
+        }
+
+        .result-box {
+            background: #f0f7ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .phoneme-display {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2em;
+            color: #333;
+            margin: 10px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+        }
+
+        audio {
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .info-box {
+            background: #e8f4f8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+            color: #555;
+        }
+
+        .info-box li {
+            margin: 8px 0;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: relative;
+                top: 0;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔊 HMM Pronunciation Generator</h1>
+        <p class="subtitle">Using Hidden Markov Models + eSpeak NG</p>
+
+        <!-- Sidebar - Training -->
+        <div class="sidebar">
+            <div class="card">
+                <h2>📚 Training Phase</h2>
+                <p style="color: #666; margin-bottom: 15px;">Train the HMM system on words to learn phoneme patterns</p>
+                
+                <div class="input-group">
+                    <label>Enter training words (one per line)</label>
+                    <textarea id="trainingWords">apple
+banana
+orange
+grape
+mango
+cherry
+melon
+berry
+peach
+plum</textarea>
+                </div>
+
+                <button class="btn btn-primary" onclick="trainSystem()">🎯 Train System</button>
+
+                <div id="trainingResult"></div>
+
+                <div id="statsDisplay" style="display: none;">
+                    <div class="stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="wordsLearned">0</div>
+                            <div class="stat-label">Words Learned</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="uniquePhonemes">0</div>
+                            <div class="stat-label">Unique Phonemes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="phonemePatterns">0</div>
+                            <div class="stat-label">Patterns</div>
+                        </div>
+                    </div>
+
+                    <div id="learnedPhonemes" class="learned-phonemes"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Area - Generation -->
+        <div>
+            <div class="card">
+                <h2>🎤 Generate Pronunciation</h2>
+                
+                <div class="input-group">
+                    <label>Enter any word to generate pronunciation</label>
+                    <input type="text" id="inputWord" placeholder="e.g., strawberry, watermelon, pineapple...">
+                </div>
+
+                <div class="controls">
+                    <div class="input-group">
+                        <label>Voice</label>
+                        <select id="voice">
+                            <option value="en">English</option>
+                            <option value="en-us">English (US)</option>
+                            <option value="en-gb">English (GB)</option>
+                            <option value="en-au">English (AU)</option>
+                            <option value="en-in">English (IN)</option>
+                        </select>
+                    </div>
+
+                    <div class="slider-group">
+                        <label>Speed (WPM)</label>
+                        <input type="range" id="speed" min="80" max="300" value="175" oninput="updateSliderValue('speed')">
+                        <div class="slider-value" id="speedValue">175</div>
+                    </div>
+
+                    <div class="slider-group">
+                        <label>Pitch</label>
+                        <input type="range" id="pitch" min="0" max="99" value="50" oninput="updateSliderValue('pitch')">
+                        <div class="slider-value" id="pitchValue">50</div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="generatePronunciation()">🔊 Generate Audio</button>
+
+                <div id="generationResult"></div>
+
+                <div class="info-box">
+                    <h3>ℹ️ How This System Works</h3>
+                    <ul>
+                        <li><strong>Training Phase:</strong> Feed the system training words to learn phoneme patterns</li>
+                        <li><strong>Phoneme Prediction:</strong> System predicts phoneme sequences for any word</li>
+                        <li><strong>Audio Generation:</strong> Converts phonemes to natural-sounding speech</li>
+                        <li><strong>Self-Learning:</strong> No hardcoded dictionary, works on unseen words</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isTrainingComplete = false;
+
+        function updateSliderValue(sliderId) {
+            const slider = document.getElementById(sliderId);
+            const display = document.getElementById(sliderId + 'Value');
+            display.textContent = slider.value;
+        }
+
+        async function trainSystem() {
+            const textarea = document.getElementById('trainingWords');
+            const words = textarea.value.split('\n').map(w => w.trim()).filter(w => w);
+            const resultDiv = document.getElementById('trainingResult');
+
+            if (words.length === 0) {
+                resultDiv.innerHTML = '<div class="alert alert-warning">Please enter at least one word</div>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<div class="spinner"></div><p style="text-align: center;">Training HMM model...</p>';
+
+            try {
+                const response = await fetch('/api/train', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ words })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    isTrainingComplete = true;
+                    resultDiv.innerHTML = `<div class="alert alert-success">✅ ${data.message}</div>`;
+
+                    // Update stats
+                    document.getElementById('wordsLearned').textContent = data.stats.words_learned;
+                    document.getElementById('uniquePhonemes').textContent = data.stats.unique_phonemes;
+                    document.getElementById('phonemePatterns').textContent = data.stats.phoneme_patterns;
+                    document.getElementById('statsDisplay').style.display = 'block';
+
+                    // Display learned phonemes
+                    const phonemesDiv = document.getElementById('learnedPhonemes');
+                    const displayCount = Math.min(5, data.results.length);
+                    let html = '<h3 style="margin-bottom: 10px; color: #667eea;">Learned Phonemes</h3>';
+                    
+                    for (let i = 0; i < displayCount; i++) {
+                        const item = data.results[i];
+                        html += `<div class="phoneme-item">${item.word} → ${item.phonemes}</div>`;
+                    }
+                    
+                    if (data.results.length > 5) {
+                        html += `<p style="text-align: center; color: #666; margin-top: 10px;">...and ${data.results.length - 5} more words</p>`;
+                    }
+                    
+                    phonemesDiv.innerHTML = html;
+                } else {
+                    resultDiv.innerHTML = '<div class="alert alert-error">Training failed</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="alert alert-error">Error: ${error.message}</div>`;
+            }
+        }
+
+        async function generatePronunciation() {
+            const word = document.getElementById('inputWord').value.trim();
+            const voice = document.getElementById('voice').value;
+            const speed = parseInt(document.getElementById('speed').value);
+            const pitch = parseInt(document.getElementById('pitch').value);
+            const resultDiv = document.getElementById('generationResult');
+
+            if (!word) {
+                resultDiv.innerHTML = '<div class="alert alert-warning">Please enter a word</div>';
+                return;
+            }
+
+            if (!isTrainingComplete) {
+                resultDiv.innerHTML = '<div class="alert alert-warning">⚠️ Please train the system first using the sidebar!</div>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<div class="spinner"></div><p style="text-align: center;">Generating pronunciation...</p>';
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ word, voice, speed, pitch })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="result-box">
+                            <h3 style="color: #667eea;">Phoneme Sequence:</h3>
+                            <div class="phoneme-display">${data.phonemes}</div>
+                            
+                            <h3 style="color: #667eea; margin-top: 20px;">🎵 Generated Audio:</h3>
+                            <audio controls autoplay>
+                                <source src="data:audio/wav;base64,${data.audio_base64}" type="audio/wav">
+                            </audio>
+                            
+                            <button class="btn btn-primary" onclick="downloadAudio('${data.audio_base64}', '${word}')">
+                                📥 Download WAV
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = '<div class="alert alert-error">Generation failed</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="alert alert-error">Error: ${error.message}</div>`;
+            }
+        }
+
+        function downloadAudio(base64Data, word) {
+            const link = document.createElement('a');
+            link.href = `data:audio/wav;base64,${base64Data}`;
+            link.download = `${word}_pronunciation.wav`;
+            link.click();
+        }
+
+        // Allow Enter key to generate
+        document.getElementById('inputWord').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generatePronunciation();
+            }
+        });
+    </script>
+</body>
+</html>
