@@ -12,7 +12,7 @@ from typing import List, Optional
 import uvicorn
 
 # Configuration
-ESPEAK_PATH = r"C:\Program Files\eSpeak NG\espeak-ng.exe"
+ESPEAK_PATH = "/usr/bin/espeak-ng"
 
 app = FastAPI(title="HMM Pronunciation Generator")
 
@@ -289,4 +289,5 @@ if __name__ == "__main__":
         print(f"⚠️ Warning: eSpeak NG not found at: {ESPEAK_PATH}")
         print("Please install eSpeak NG and update the ESPEAK_PATH variable")
     
+
     uvicorn.run(app, host="0.0.0.0", port=8001)
