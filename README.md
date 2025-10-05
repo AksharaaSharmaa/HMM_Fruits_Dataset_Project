@@ -1,4 +1,4 @@
-# 🔊 HMM-Based Speech Recognition & Pronunciation Generator
+<center> # 🔊 HMM-Based Speech Recognition & Pronunciation Generator
 
 > **Train once on a small dataset, generalize to the entire English language.** This project demonstrates how Hidden Markov Models can learn speech patterns from just a handful of fruit names and extend that knowledge to recognize and pronounce any English word.
 
